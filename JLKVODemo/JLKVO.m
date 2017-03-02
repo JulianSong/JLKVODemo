@@ -20,6 +20,7 @@
     return NO;
 }
 
+
 - (void)setName:(NSString *)name
 {
     _name = name;
@@ -38,5 +39,6 @@
     _title = title;
     [self didChangeValueForKey:@"title"];
 }
+
 
 @end

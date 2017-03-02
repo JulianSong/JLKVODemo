@@ -25,20 +25,20 @@ static void*JLKVORole = &JLKVORole;
     self.kvoObject.role = [NSMutableArray arrayWithArray:@[@"aaa",@"bbb"]];
 //    self.kvoObject.phone = @"start";
     [self.kvoObject addObserver:self
-                     forKeyPath:@"name"
+                     forKeyPath:NSStringFromSelector(@selector(name))
                         options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld
                         context:JLKVOName];
     [self.kvoObject addObserver:self
-                     forKeyPath:@"phone"
+                     forKeyPath:NSStringFromSelector(@selector(phone))
                         options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld|NSKeyValueObservingOptionInitial//加入此参数在本方法调用时会立即触发observeValueForKeyPath方法
                         context:JLKVOPhone];
     
     [self.kvoObject addObserver:self
-                     forKeyPath:@"title"
+                     forKeyPath:NSStringFromSelector(@selector(title))
                         options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld|NSKeyValueObservingOptionPrior//加入此参数会在willChangeValueForKey被触发时候立即触发observeValueForKeyPath方法
                         context:JLKVOTitle];
     [self.kvoObject addObserver:self
-                     forKeyPath:@"role"
+                     forKeyPath:NSStringFromSelector(@selector(role))
                         options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld
                         context:JLKVORole];
 
@@ -87,7 +87,8 @@ static void*JLKVORole = &JLKVORole;
         self.kvoObject.title = [[NSDate date] description];
     }
     if (indexPath.row == 3) {
-        [self.kvoObject.role addObject:@"cccc"];
+        NSMutableArray *role = [self.kvoObject mutableArrayValueForKey:@"role"];
+        [role addObjectsFromArray:@[@"cc",@"dd",@"ee"]];
     }
 }
 @end
