@@ -13,4 +13,6 @@
 @property(nonatomic,strong)NSString *phone;
 @property(nonatomic,strong)NSString *title;
 @property(nonatomic,strong)NSMutableArray *role;
+@property(nonatomic,strong)NSMutableDictionary *store;
+@property(nonatomic,strong,readonly)NSString *cv;
 @end

@@ -12,6 +12,7 @@ static void*JLKVOName = &JLKVOName;
 static void*JLKVOPhone = &JLKVOPhone;
 static void*JLKVOTitle = &JLKVOTitle;
 static void*JLKVORole = &JLKVORole;
+static void*JLKVOCV = &JLKVOCV;
 
 @interface JLTableViewController ()
 @property(nonnull,strong)JLKVO *kvoObject;
@@ -42,6 +43,10 @@ static void*JLKVORole = &JLKVORole;
                         options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld
                         context:JLKVORole];
 
+    [self.kvoObject addObserver:self
+                     forKeyPath:NSStringFromSelector(@selector(cv))
+                        options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld
+                        context:JLKVOCV];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
@@ -61,6 +66,10 @@ static void*JLKVORole = &JLKVORole;
     {
         NSLog(@"\n%@\n%@",keyPath,change);
     }
+    else if (context == JLKVOCV)
+    {
+        NSLog(@"\n%@\n%@",keyPath,change);
+    }
     else
     {
         //如果此方法传递到NSObject 则会抛出NSInternalInconsistencyException。
@@ -77,18 +86,41 @@ static void*JLKVORole = &JLKVORole;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.row == 0) {
-        self.kvoObject.name = [[NSDate date] description];
+    if (indexPath.section == 0) {
+        if (indexPath.row == 0) {
+            self.kvoObject.name = @"Tome";
+        }
+        if (indexPath.row == 1) {
+            self.kvoObject.phone = @"8888";
+        }
+        if (indexPath.row == 2) {
+            self.kvoObject.title = @"cat";
+        }
+        if (indexPath.row == 3) {
+            NSMutableArray *role = [self.kvoObject mutableArrayValueForKey:@"role"];
+            [role addObjectsFromArray:@[@"cc",@"dd",@"ee"]];
+        }
     }
-    if (indexPath.row == 1) {
-        self.kvoObject.phone = [[NSDate date] description];
-    }
-    if (indexPath.row == 2) {
-        self.kvoObject.title = [[NSDate date] description];
-    }
-    if (indexPath.row == 3) {
-        NSMutableArray *role = [self.kvoObject mutableArrayValueForKey:@"role"];
-        [role addObjectsFromArray:@[@"cc",@"dd",@"ee"]];
+    else if (indexPath.section == 1) {
+        
+        if (indexPath.row == 0) {
+            [self.kvoObject setValue:@"Jerry" forKey:NSStringFromSelector(@selector(name))];
+            [self.kvoObject setValue:@"66666" forKey:NSStringFromSelector(@selector(phone))];
+            
+            [self.kvoObject setValue:@"deep" forKey:@"undefinedKey"];
+        }
+        else if (indexPath.row == 1)
+        {
+            NSLog(@"value for name :%@",[self.kvoObject valueForKey:@"name"]);
+            NSLog(@"value for phone :%@",[self.kvoObject valueForKey:@"phone"]);
+            NSLog(@"value for cv :%@",[self.kvoObject valueForKey:@"cv"]);
+            
+            NSLog(@"value for undefinedKey :%@",[self.kvoObject valueForKey:@"undefinedKey"]);
+            
+            [self.kvoObject.store setValue:@"cat" forKey:@"what"];
+            NSLog(@"value for store.what :%@",[self.kvoObject valueForKey:@"store.what"]);
+        }
+        
     }
 }
 @end
