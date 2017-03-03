@@ -8,6 +8,7 @@
 
 #import "JLTableViewController.h"
 #import "JLKVO.h"
+#import <objc/runtime.h>
 static void*JLKVOName = &JLKVOName;
 static void*JLKVOPhone = &JLKVOPhone;
 static void*JLKVOTitle = &JLKVOTitle;
@@ -24,6 +25,7 @@ static void*JLKVOCV = &JLKVOCV;
     [super viewDidLoad];
     self.kvoObject = [[JLKVO alloc] init];
     self.kvoObject.role = [NSMutableArray arrayWithArray:@[@"aaa",@"bbb"]];
+    NSLog(@"class of kvoObject before regist:%@",object_getClass(self.kvoObject));
 //    self.kvoObject.phone = @"start";
     [self.kvoObject addObserver:self
                      forKeyPath:NSStringFromSelector(@selector(name))
@@ -47,6 +49,10 @@ static void*JLKVOCV = &JLKVOCV;
                      forKeyPath:NSStringFromSelector(@selector(cv))
                         options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld
                         context:JLKVOCV];
+    /*
+     对象被注册为kvo后isa会被重写，此处kvoObject的类会由JLKVO变为NSKVONotifying_JLKVO
+     */
+    NSLog(@"class of kvoObject after regist:%@",object_getClass(self.kvoObject));
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
@@ -89,6 +95,7 @@ static void*JLKVOCV = &JLKVOCV;
     if (indexPath.section == 0) {
         if (indexPath.row == 0) {
             self.kvoObject.name = @"Tome";
+            
         }
         if (indexPath.row == 1) {
             self.kvoObject.phone = @"8888";
