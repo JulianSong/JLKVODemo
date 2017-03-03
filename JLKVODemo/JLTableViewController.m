@@ -14,6 +14,7 @@ static void*JLKVOPhone = &JLKVOPhone;
 static void*JLKVOTitle = &JLKVOTitle;
 static void*JLKVORole = &JLKVORole;
 static void*JLKVOCV = &JLKVOCV;
+static void*JLKVOInnerVal = &JLKVOInnerVal;
 
 @interface JLTableViewController ()
 @property(nonnull,strong)JLKVO *kvoObject;
@@ -49,10 +50,17 @@ static void*JLKVOCV = &JLKVOCV;
                      forKeyPath:NSStringFromSelector(@selector(cv))
                         options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld
                         context:JLKVOCV];
+    [self.kvoObject addObserver:self
+                     forKeyPath:@"_innerValue"
+                        options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld
+                        context:JLKVOInnerVal];
     /*
-     对象被注册为kvo后isa会被重写，此处kvoObject的类会由JLKVO变为NSKVONotifying_JLKVO
+     对象被注册为kvo后isa会被重写，此处kvoObject的类会由JLKVO变为NSKVONotifying_JLKVO。
+     ios7之后isa属性不在使用。由object_getClass 和object_setClass 对isa属性进行操作
      */
     NSLog(@"class of kvoObject after regist:%@",object_getClass(self.kvoObject));
+    
+    self.kvoObject.access = [NSMutableArray arrayWithArray:@[@(2),@(3),@(5)]];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
@@ -75,6 +83,10 @@ static void*JLKVOCV = &JLKVOCV;
     else if (context == JLKVOCV)
     {
         NSLog(@"\n%@\n%@",keyPath,change);
+    }
+    else if (context == JLKVOInnerVal)
+    {
+        NSLog(@"成员变量\n%@\n%@",keyPath,change);
     }
     else
     {
@@ -114,20 +126,45 @@ static void*JLKVOCV = &JLKVOCV;
             [self.kvoObject setValue:@"Jerry" forKey:NSStringFromSelector(@selector(name))];
             [self.kvoObject setValue:@"66666" forKey:NSStringFromSelector(@selector(phone))];
             
+            [self.kvoObject setValue:@"cat" forKeyPath:@"store.what"];
             [self.kvoObject setValue:@"deep" forKey:@"undefinedKey"];
+            /*
+             成员变量也可以用kvc 和kvo。
+             通过kvc设置成员变量的值时可以触发kvo，直接修改时则需要调用willChangeValueForKey
+             和didChangeValueForKey两个方法。
+             */
+            [self.kvoObject setValue:@"set inner by kvc" forKey:@"_innerValue"];
+            
+            [self.kvoObject updateInnerValue:@"set inner by message"];
         }
         else if (indexPath.row == 1)
         {
             NSLog(@"value for name :%@",[self.kvoObject valueForKey:@"name"]);
             NSLog(@"value for phone :%@",[self.kvoObject valueForKey:@"phone"]);
             NSLog(@"value for cv :%@",[self.kvoObject valueForKey:@"cv"]);
+            NSLog(@"value for _innerValue :%@",[self.kvoObject valueForKey:@"_innerValue"]);
             
             NSLog(@"value for undefinedKey :%@",[self.kvoObject valueForKey:@"undefinedKey"]);
             
-            [self.kvoObject.store setValue:@"cat" forKey:@"what"];
-            NSLog(@"value for store.what :%@",[self.kvoObject valueForKey:@"store.what"]);
+            
+            NSLog(@"value for store.what :%@",[self.kvoObject valueForKeyPath:@"store.what"]);
         }
         
+    }
+    else if (indexPath.section == 2) {
+        if (indexPath.row == 0) {
+            NSLog(@"sum for access :%@",[self.kvoObject valueForKeyPath:@"access.@sum.self"]);
+        }
+        
+        if (indexPath.row == 1) {
+            NSLog(@"max for access :%@",[self.kvoObject valueForKeyPath:@"access.@max.self"]);
+        }
+        if (indexPath.row == 2) {
+            NSLog(@"min for access :%@",[self.kvoObject valueForKeyPath:@"access.@min.self"]);
+        }
+        if (indexPath.row == 3) {
+            NSLog(@"avg for access :%@",[self.kvoObject valueForKeyPath:@"access.@avg.self"]);
+        }
     }
 }
 @end

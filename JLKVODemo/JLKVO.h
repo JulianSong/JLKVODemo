@@ -15,4 +15,7 @@
 @property(nonatomic,strong)NSMutableArray *role;
 @property(nonatomic,strong)NSMutableDictionary *store;
 @property(nonatomic,strong,readonly)NSString *cv;
+@property(nonatomic,strong)NSMutableArray<NSNumber *> *access;
+
+- (void)updateInnerValue:(NSString *)innerVal;
 @end

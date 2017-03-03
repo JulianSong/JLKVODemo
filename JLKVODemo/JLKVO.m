@@ -8,7 +8,9 @@
 
 #import "JLKVO.h"
 @interface JLKVO()
-
+{
+    NSString *_innerValue;
+}
 @end
 @implementation JLKVO
 - (instancetype)init
@@ -80,4 +82,10 @@
     [self.store setValue:value forKey:key];
 }
 
+- (void)updateInnerValue:(NSString *)innerVal
+{
+    [self willChangeValueForKey:@"_innerValue"];
+    _innerValue = innerVal;
+    [self didChangeValueForKey:@"_innerValue"];
+}
 @end
