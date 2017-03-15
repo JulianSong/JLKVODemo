@@ -60,7 +60,7 @@ static void*JLKVOInnerVal = &JLKVOInnerVal;
      */
     NSLog(@"class of kvoObject after regist:%@",object_getClass(self.kvoObject));
     
-    self.kvoObject.access = [NSMutableArray arrayWithArray:@[@(2),@(3),@(5)]];
+    self.kvoObject.access = [NSMutableArray arrayWithArray:@[@(2),@(3),@(5),@(2),@(5)]];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context
@@ -118,6 +118,7 @@ static void*JLKVOInnerVal = &JLKVOInnerVal;
         if (indexPath.row == 3) {
             NSMutableArray *role = [self.kvoObject mutableArrayValueForKey:@"role"];
             [role addObjectsFromArray:@[@"cc",@"dd",@"ee"]];
+            [role removeObjectAtIndex:0];
         }
     }
     else if (indexPath.section == 1) {
@@ -164,6 +165,12 @@ static void*JLKVOInnerVal = &JLKVOInnerVal;
         }
         if (indexPath.row == 3) {
             NSLog(@"avg for access :%@",[self.kvoObject valueForKeyPath:@"access.@avg.self"]);
+        }
+        if (indexPath.row == 4) {
+            NSLog(@"distinctUnionOfObjects for access :%@",[self.kvoObject valueForKeyPath:@"access.@distinctUnionOfObjects.self"]);
+        }
+        if (indexPath.row == 5) {
+            NSLog(@"unionOfObjects for access :%@",[self.kvoObject valueForKeyPath:@"access.@unionOfObjects.self"]);
         }
     }
 }
