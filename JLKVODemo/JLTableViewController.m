@@ -34,12 +34,12 @@ static void*JLKVOInnerVal = &JLKVOInnerVal;
                         context:JLKVOName];
     [self.kvoObject addObserver:self
                      forKeyPath:NSStringFromSelector(@selector(phone))
-                        options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld|NSKeyValueObservingOptionInitial//加入此参数在本方法调用时会立即触发observeValueForKeyPath方法
+                        options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld|NSKeyValueObservingOptionInitial//加入NSKeyValueObservingOptionInitial,在本方法调用时会立即触发observeValueForKeyPath方法
                         context:JLKVOPhone];
     
     [self.kvoObject addObserver:self
                      forKeyPath:NSStringFromSelector(@selector(title))
-                        options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld|NSKeyValueObservingOptionPrior//加入此参数会在willChangeValueForKey被触发时候立即触发observeValueForKeyPath方法
+                        options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld|NSKeyValueObservingOptionPrior//加入NSKeyValueObservingOptionPrior会在willChangeValueForKey被触发时候立即触发observeValueForKeyPath方法 并包好NSKeyValueChangeNotificationIsPriorKey 在值被修改后会再次调用。
                         context:JLKVOTitle];
     [self.kvoObject addObserver:self
                      forKeyPath:NSStringFromSelector(@selector(role))
@@ -55,7 +55,11 @@ static void*JLKVOInnerVal = &JLKVOInnerVal;
                         options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld
                         context:JLKVOInnerVal];
     /*
-     对象被注册为kvo后isa会被重写，此处kvoObject的类会由JLKVO变为NSKVONotifying_JLKVO。
+     对象被注册为kvo后系统会做如下事情
+     1，类对象被第一次注册时候系统会创建该类的派生类NSKVONotifying_JLKVO。
+     2，系统在派生类上重写被注册的keyPath的set方法。（因此自己实现改熟悉的set方法不会影响kvo）
+     3，重写类方法class是外接看来该类的对象没有变化。重写dealloc方法
+     4，将改对象的isa指针指向NSKVONotifying_JLKVO上。
      ios7之后isa属性不在使用。由object_getClass 和object_setClass 对isa属性进行操作
      */
     NSLog(@"class of kvoObject after regist:%@",object_getClass(self.kvoObject));
